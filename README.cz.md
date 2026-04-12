@@ -9,8 +9,8 @@ Automatizovaný pipeline pro export inventury aplikací z Microsoft Intune do Az
 ├── Export-IntuneApps-ToLA-BlobStorage.ps1    # Runbook s Blob Storage (velké tenanty)
 ├── IntuneDetectedApps-PowerBI.kql            # KQL dotazy pro Power BI
 ├── la-table-schema-sample.json               # Sample JSON pro vytvoření LA tabulky
-├── README.md                                 # Tento soubor (česky)
-└── README.en.md                              # English version
+├── README.md                                 # Tento soubor (anglicky)
+└── README.cz.md                              # Tento soubor (česky)
 ```
 
 ## Architektura
