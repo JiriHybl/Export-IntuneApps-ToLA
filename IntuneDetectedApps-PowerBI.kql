@@ -1,0 +1,42 @@
+// ============================================================
+// Power BI - KQL queries for IntuneDetectedApps_CL
+// Connection: Power BI Desktop → Get Data → Azure Monitor Logs
+// ============================================================
+
+// --- Main query: latest import only ---
+let LastRun = toscalar(IntuneDetectedApps_CL | summarize max(TimeGenerated));
+IntuneDetectedApps_CL
+| where TimeGenerated >= LastRun - 1m
+| project
+    TimeGenerated,
+    ApplicationName,
+    ApplicationPublisher,
+    ApplicationShortVersion,
+    ApplicationVersion,
+    DeviceName,
+    EmailAddress,
+    OSDescription,
+    OSVersion,
+    Platform,
+    UserName
+
+
+// ============================================================
+// HISTORICAL REPORT — for a separate Power BI page
+// ============================================================
+
+// --- Unique app count over time (trend) ---
+// IntuneDetectedApps_CL
+// | summarize UniqueApps = dcount(ApplicationName) by bin(TimeGenerated, 1d)
+// | sort by TimeGenerated asc
+
+// --- Unique device count over time ---
+// IntuneDetectedApps_CL
+// | summarize UniqueDevices = dcount(DeviceName) by bin(TimeGenerated, 1d)
+// | sort by TimeGenerated asc
+
+// --- Full historical data (for time range slicer) ---
+// IntuneDetectedApps_CL
+// | project TimeGenerated, DeviceName, EmailAddress, ApplicationName,
+//           ApplicationVersion, ApplicationPublisher, Platform, OSVersion
+// | sort by TimeGenerated desc

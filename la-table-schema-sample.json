@@ -1,0 +1,15 @@
+[
+  {
+    "TimeGenerated": "2026-01-01T00:00:00Z",
+    "ApplicationName": "Microsoft Edge",
+    "ApplicationPublisher": "Microsoft Corporation",
+    "ApplicationShortVersion": "120.0",
+    "ApplicationVersion": "120.0.2210.133",
+    "DeviceName": "DESKTOP-001",
+    "EmailAddress": "jan.novak@contoso.com",
+    "OSDescription": "Windows 11 Pro",
+    "OSVersion": "10.0.22631.0",
+    "Platform": "Windows",
+    "UserName": "jan.novak@contoso.com"
+  }
+]
