@@ -1,0 +1,207 @@
+###############################################################################
+# .gitignore (Copilot generated)
+# Purpose: prevent accidental commits of tenant/customer output, auth caches,
+#          local config, logs, and editor-specific files.
+###############################################################################
+
+# ---------------------------------------------------------------------------
+# 1) Secrets / credentials / local configuration (NEVER commit)
+# ---------------------------------------------------------------------------
+
+# Common env files
+.env
+.env.*
+*.env
+
+# Local settings / app settings
+local.settings.json
+appsettings.json
+appsettings.*.json
+settings.json
+settings.*.json
+config.json
+config.*.json
+tenant.json
+tenant.*.json
+
+# PowerShell secret helpers (developers often create these)
+*.secrets.ps1
+*.secret.ps1
+*.credentials.ps1
+*.creds.ps1
+*.private.ps1
+
+# Key/cert material (used for app registration auth, signing, etc.)
+*.pfx
+*.pem
+*.key
+*.cer
+*.crt
+*.p12
+*.jks
+
+# ---------------------------------------------------------------------------
+# 2) Auth caches / tokens (Graph SDK, Azure CLI/PowerShell)
+# ---------------------------------------------------------------------------
+
+# Azure CLI profile/cache
+.azure/
+
+# Az PowerShell context dumps (rare, but painful if leaked)
+*.AzureRmContext.json
+*.AzureRMContext.json
+*.AzContext.json
+
+# MSAL / Graph token caches (names vary by SDK/tooling)
+msalcache.bin*
+msal_cache.bin*
+tokenCache.dat
+tokencache.dat
+*token*cache*
+AuthRecord.json
+
+# ---------------------------------------------------------------------------
+# 3) Tenant / customer exported data & artefacts (Intune export, LA payloads)
+# ---------------------------------------------------------------------------
+
+# Common output folders
+exports/
+export/
+output/
+out/
+reports/
+report/
+data/
+dataset/
+tmp/
+temp/
+scratch/
+artifacts/
+artifacts-*/
+logs/
+log/
+debug/
+trace/
+
+# Intune export ZIP/CSV artefacts (even if your runbook doesn't extract, local
+# testing often will)
+*.zip
+*.csv
+
+# Data payloads commonly used for LA ingestion testing
+*.ndjson
+*.jsonl
+
+# Generic generated content formats that often contain tenant data
+*.xlsx
+*.xls
+*.html
+
+# Optional: JSON exports (keep ignored by default to avoid tenant leakage)
+# If you DO have non-tenant JSON that must be tracked, put it under /src or /docs
+# and add an allow-rule below.
+*.json
+
+# Allow JSON that is safe and intended for repo (examples, schemas, templates)
+!/docs/**/*.json
+!/doc/**/*.json
+!/examples/**/*.json
+!/example/**/*.json
+!/samples/**/*.json
+!/sample/**/*.json
+!/schema/**/*.json
+!/schemas/**/*.json
+!/templates/**/*.json
+!/template/**/*.json
+
+# Common “export naming” patterns (extra safety)
+*Intune*Export*
+*Intune*Apps*
+*AppInv*
+*AppInventory*
+*DetectedApps*
+*Win32Apps*
+*Assignments*
+*GroupAssignment*
+*Tenant*
+*Customer*
+*Prod*
+*UAT*
+
+# ---------------------------------------------------------------------------
+# 4) Azure Automation / Functions / pipeline runtime artefacts
+# ---------------------------------------------------------------------------
+
+# PowerShell transcripts (Start-Transcript)
+transcript*.txt
+*transcript*.txt
+
+# Common automation outputs
+run-*.log
+run-*.json
+run-*.csv
+
+# ---------------------------------------------------------------------------
+# 5) Pester / test results
+# ---------------------------------------------------------------------------
+
+TestResults/
+test-results/
+PesterTestResults.xml
+*.Tests.xml
+*-tests.xml
+coverage/
+coverage.*
+*.trx
+
+# ---------------------------------------------------------------------------
+# 6) Editor / IDE files (keep repo clean; avoid leaking tenant IDs in launch.json)
+# ---------------------------------------------------------------------------
+
+# VS Code - ignore user-specific settings (often contain TenantId, WorkspaceId, etc.)
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/*.local.json
+
+# Workspace files
+*.code-workspace
+
+# JetBrains
+.idea/
+*.iml
+
+# Visual Studio
+.vs/
+
+# ---------------------------------------------------------------------------
+# 7) OS junk
+# ---------------------------------------------------------------------------
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---------------------------------------------------------------------------
+# 8) PowerShell / module packaging artefacts
+# ---------------------------------------------------------------------------
+
+# If you ever package as a module or publish artefacts
+*.nupkg
+*.snupkg
+*.zip
+
+# Developer-only profile scripts
+.profile.ps1
+profile.ps1
+
+# ---------------------------------------------------------------------------
+# 9) GitHub CLI / tooling temporary folders
+# ---------------------------------------------------------------------------
+
+.gh/
+tmp/
+
+###############################################################################
+# End
+###############################################################################
