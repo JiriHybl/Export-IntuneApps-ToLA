@@ -28,7 +28,7 @@
     Az.Storage module must be available in the Automation Account.
 
 .NOTES
-    Version: 1.0
+    Version: 1.1
 #>
 
 #region ── CONFIGURATION ────────────────────────────────────────────────────────
@@ -86,6 +86,32 @@ $MonitorToken  = (Get-AzAccessToken -ResourceUrl "https://monitor.azure.com/").T
 $StorageToken  = (Get-AzAccessToken -ResourceUrl "https://storage.azure.com/").Token
 Write-Output "Tokens acquired."
 
+# ── Retry helper — respects Retry-After, handles 429 & 503 ──────────────────
+function Invoke-WithRetry {
+    param(
+        [scriptblock]$ScriptBlock,
+        [int]$MaxRetries = 5
+    )
+    $attempt = 0
+    while ($true) {
+        try {
+            return & $ScriptBlock
+        } catch {
+            $statusCode = $_.Exception.Response?.StatusCode.value__
+            if ($statusCode -in 429, 503 -and $attempt -lt $MaxRetries) {
+                $retryAfter = 30
+                $raHeader = $_.Exception.Response?.Headers?['Retry-After']
+                if ($raHeader) { $retryAfter = [int]$raHeader }
+                $attempt++
+                Write-Warning "HTTP $statusCode — throttled. Retry $attempt/$MaxRetries in $retryAfter s..."
+                Start-Sleep -Seconds $retryAfter
+            } else {
+                throw
+            }
+        }
+    }
+}
+
 $GraphHeaders = @{
     "Authorization" = "Bearer $GraphToken"
     "Content-Type"  = "application/json"
@@ -101,11 +127,13 @@ $exportBody = @{
 } | ConvertTo-Json
 
 try {
-    $exportJob = Invoke-RestMethod `
-        -Uri     "$GraphBaseUrl/deviceManagement/reports/exportJobs" `
-        -Method  POST `
-        -Headers $GraphHeaders `
-        -Body    $exportBody
+    $exportJob = Invoke-WithRetry {
+        Invoke-RestMethod `
+            -Uri     "$GraphBaseUrl/deviceManagement/reports/exportJobs" `
+            -Method  POST `
+            -Headers $GraphHeaders `
+            -Body    $exportBody
+    }
 } catch {
     Write-Output "HTTP $($_.Exception.Response.StatusCode.value__) - Graph error:"
     Write-Output $_.ErrorDetails.Message
@@ -123,10 +151,12 @@ $downloadUrl = $null
 do {
     Start-Sleep -Seconds $PollIntervalSec
     $elapsed += $PollIntervalSec
-    $jobStatus = Invoke-RestMethod `
-        -Uri     "$GraphBaseUrl/deviceManagement/reports/exportJobs/$jobId" `
-        -Method  GET `
-        -Headers $GraphHeaders
+    $jobStatus = Invoke-WithRetry {
+        Invoke-RestMethod `
+            -Uri     "$GraphBaseUrl/deviceManagement/reports/exportJobs/$jobId" `
+            -Method  GET `
+            -Headers $GraphHeaders
+    }
     Write-Output "  [$elapsed s] Status: $($jobStatus.status)"
     switch ($jobStatus.status) {
         "completed" { $downloadUrl = $jobStatus.url; break }
@@ -221,10 +251,12 @@ function Send-Batch {
     if ($b.Count -eq 0) { return }
     $json   = $b | ConvertTo-Json -Depth 2 -Compress
     $sizeKB = [System.Text.Encoding]::UTF8.GetByteCount($json) / 1KB
-    $resp   = Invoke-WebRequest `
-                  -Uri $ingestUri -Method POST -Headers $ingestHeaders `
-                  -Body ([System.Text.Encoding]::UTF8.GetBytes($json)) `
-                  -UseBasicParsing
+    $resp   = Invoke-WithRetry {
+        Invoke-WebRequest `
+            -Uri $ingestUri -Method POST -Headers $ingestHeaders `
+            -Body ([System.Text.Encoding]::UTF8.GetBytes($json)) `
+            -UseBasicParsing
+    }
     Write-Output "  Batch $num → HTTP $($resp.StatusCode) | $($b.Count) records | $([math]::Round($sizeKB)) KB"
     if ($resp.StatusCode -notin 200, 204) {
         Write-Warning "Unexpected HTTP $($resp.StatusCode): $($resp.Content)"
