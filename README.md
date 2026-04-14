@@ -40,10 +40,13 @@ Both versions are functionally identical — they differ only in how the ZIP fil
 
 ## 1. Log Analytics — Create the Table
 
-1. **portal.azure.com → Log Analytics Workspace → Tables → Create → New custom log (DCR based)**
+1. **portal.azure.com → Log Analytics Workspace → Create or select workspace → Tables → Create → Create a custom log
 2. Table name: `IntuneDetectedApps` (LA will append `_CL` automatically)
-3. Upload `la-table-schema-sample.json` to define the schema
-4. After creation, note down:
+3. Table plan: Analytics
+4. Create a new data collection rule
+5. Create a new Date collection endpoint in the Azure portal (same resource group) and select 
+6. Upload `la-table-schema-sample.json` to define the schema
+7. After creation, note down:
    - **DCR Immutable ID** → Monitor → Data Collection Rules → your DCR → Overview → JSON View → `immutableId` field
    - **Logs Ingestion URI** → Monitor → Data Collection Endpoints → your DCE → Overview → **Logs Ingestion**
 
