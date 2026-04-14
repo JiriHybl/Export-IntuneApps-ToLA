@@ -47,8 +47,8 @@ Both versions are functionally identical — they differ only in how the ZIP fil
 5. Create a new Date collection endpoint in the Azure portal (same resource group) and select 
 6. Upload `la-table-schema-sample.json` to define the schema
 7. After creation, note down:
-   - **DCR Immutable ID** → Monitor → Data Collection Rules → your DCR → Overview → JSON View → `immutableId` field
-   - **Logs Ingestion URI** → Monitor → Data Collection Endpoints → your DCE → Overview → **Logs Ingestion**
+   - **DCR Immutable ID**: Monitor → Data Collection Rules → your DCR → Overview → JSON View → `immutableId` field
+   - **Logs Ingestion URI**: Monitor → Data Collection Endpoints → your DCE → Overview → **Logs Ingestion**
 
 ---
 
@@ -56,11 +56,11 @@ Both versions are functionally identical — they differ only in how the ZIP fil
 
 ### Step 1: Enable System Assigned Managed Identity
 
-**Automation Account → Identity → System assigned → Status: On → Save**
+**Azure portal → Automation Accounts → Create → System assigned → Public access → Create**
 
-Note the **Object ID**.
+Select JSON View  → Note the principalID as **Object ID**.
 
-### Step 2: Assign Graph API Permissions
+### Step 2: Assign Graph API Permissions to the Automation Account
 
 Open **Cloud Shell** (portal.azure.com → `>_` icon) → PowerShell:
 
@@ -68,7 +68,7 @@ Open **Cloud Shell** (portal.azure.com → `>_` icon) → PowerShell:
 Connect-MgGraph -Scopes "AppRoleAssignment.ReadWrite.All"
 ```
 
-Run these two commands (replace with your Object ID):
+Run these commands (replace <OBJECT-ID> with your Object ID):
 
 ```powershell
 $MIObjectId = "<OBJECT-ID>"
@@ -106,7 +106,7 @@ Edit the variables in the `CONFIGURATION` section:
 | `$ContainerName` | Container name *(Blob version only)* |
 
 Import the script into your Automation Account:
-**Automation Account → Runbooks → Import a runbook → upload .ps1 → Publish**
+**Automation Account → Runbooks → Import a runbook → upload .ps1 (PowerShell, runtime version 7.2) → Import → Publish**
 
 ---
 
