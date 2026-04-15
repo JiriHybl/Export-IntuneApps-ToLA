@@ -9,6 +9,7 @@ Automatizovaný pipeline pro export inventury aplikací z Microsoft Intune do Az
 ├── Export-IntuneApps-ToLA-BlobStorage.ps1    # Runbook s Blob Storage (velké tenanty)
 ├── IntuneDetectedApps-PowerBI.kql            # KQL dotazy pro Power BI
 ├── la-table-schema-sample.json               # Sample JSON pro vytvoření LA tabulky
+├── AppInventory.pbit                         # Ukázkový PowerBI template
 ├── README.md                                 # Tento soubor (anglicky)
 └── README.cz.md                              # Tento soubor (česky)
 ```
@@ -40,12 +41,15 @@ Obě verze jsou funkčně identické — liší se pouze způsobem uložení ZIP
 
 ## 1. Log Analytics — vytvoření tabulky
 
-1. **portal.azure.com → Log Analytics Workspace → Tables → Create → New custom log (DCR based)**
+1. **portal.azure.com → Log Analytics Workspace → Vytvoř nebo vyber workspace → Tables → Create → Create a custom log**
 2. Název tabulky: `IntuneDetectedApps` (LA přidá `_CL` automaticky)
-3. Nahraj `la-table-schema-sample.json` pro definici schématu
-4. Poznamenej si po vytvoření:
-   - **DCR Immutable ID** → Monitor → Data Collection Rules → tvůj DCR → Overview → JSON View → pole `immutableId`
-   - **Logs Ingestion URI** → Monitor → Data Collection Endpoints → tvůj DCE → Overview → **Logs Ingestion**
+3. Table plan: Analytics
+4. Vytvoř nové pravidlo sběru dat (data collection rule)
+5. Vytvoř nový endpoint pro sběr dat (data collection endpoint) na portálu Azure (stejná skupina prostředků) a vyber ho
+6. Nahraj `la-table-schema-sample.json` pro definici schématu
+7. Po vytvoření si poznamenej:
+   - **DCR Immutable ID**: Monitor → Data Collection Rules → tvůj DCR → Overview → JSON View → pole `immutableId`
+   - **Logs Ingestion URI**: Monitor → Data Collection Endpoints → tvůj DCE → Overview → **Logs Ingestion**
 
 ---
 
@@ -53,9 +57,9 @@ Obě verze jsou funkčně identické — liší se pouze způsobem uložení ZIP
 
 ### Krok 1: Zapni System Assigned Managed Identity
 
-**Automation Account → Identity → System assigned → Status: On → Save**
+**Portál Azure → Automation Accounts → Create → System assigned → Public access → Create**
 
-Poznamenej si **Object ID**.
+Vyberte JSON View → Poznamenej si principalID jako **Object ID**.
 
 ### Krok 2: Přiřaď Graph API oprávnění
 
@@ -103,7 +107,7 @@ Uprav proměnné v sekci `CONFIGURATION`:
 | `$ContainerName` | Název containeru *(pouze Blob verze)* |
 
 Importuj skript do Automation Account:
-**Automation Account → Runbooks → Import a runbook → nahraj .ps1 → Publish**
+**Automation Account → Runbooks → Import a runbook → nahraj .ps1 (PowerShell, runtime version 7.2) → Import → Publish**
 
 ---
 
@@ -118,10 +122,11 @@ Přiřaď k Runbooku: **Runbook → Link to schedule**
 
 ## 5. Power BI
 
-1. **Power BI Desktop → Načíst data → Protokoly Azure Monitoru**
-2. Přihlaš se → vyber Subscription → Resource Group → LA Workspace
-3. Vlož KQL dotaz z `IntuneDetectedApps-PowerBI.kql` (sekce "Main query")
-4. Pro vyhledávání v filtrech použij vizuál **Text Filter** z Power BI marketplace
+1. **Log Analytics Workspace → Logs** — vlož KQL dotaz z `IntuneDetectedApps-PowerBI.kql` (sekce Main query) a spusť ho pro ověření výsledků
+2. **Share → Export to Power BI (as an M query)** — LA stáhne soubor `.txt` obsahující M dotaz
+3. **Power BI Desktop → Home → New data source → Empty query → Transform data → Advanced Editor** — vytvoř prázdný dotaz, otevři Advanced Editor a vlož M dotaz ze souboru `.txt`
+4. Přejmenuj dotaz a klikni na **Done → Close & Apply**
+5. Pro vyhledávatelné filtry použij vizuál **Text Filter** z Power BI marketplace
 
 ### Doporučené vizuály
 
