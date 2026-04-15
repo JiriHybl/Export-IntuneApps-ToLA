@@ -41,7 +41,7 @@ Both versions are functionally identical — they differ only in how the ZIP fil
 
 ## 1. Log Analytics — Create the Table
 
-1. **portal.azure.com → Log Analytics Workspace → Create or select workspace → Tables → Create → Create a custom log
+1. **portal.azure.com** → Log Analytics Workspace → Create or select workspace → Tables → Create → Create a custom log
 2. Table name: `IntuneDetectedApps` (LA will append `_CL` automatically)
 3. Table plan: Analytics
 4. Create a new data collection rule
