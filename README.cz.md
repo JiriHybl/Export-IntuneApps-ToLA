@@ -59,7 +59,7 @@ Obě verze jsou funkčně identické — liší se pouze způsobem uložení ZIP
 
 **Portál Azure → Automation Accounts → Create → System assigned → Public access → Create**
 
-Vyberte JSON View → Poznamenej si principalID jako **Object ID**.
+Vyber JSON View → Poznamenej si principalID jako **Object ID**.
 
 ### Krok 2: Přiřaď Graph API oprávnění
 
